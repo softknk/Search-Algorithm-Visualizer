@@ -9,8 +9,8 @@ import java.util.*;
 
 public class Greedy extends SearchAlgo {
 
-    private List<CircleNode> openList;
-    private Set<CircleNode> closedList;
+    private final List<CircleNode> openList;
+    private final Set<CircleNode> closedList;
     private Timeline timeline;
 
     public Greedy(CircleNode start, CircleNode target) {
@@ -43,10 +43,13 @@ public class Greedy extends SearchAlgo {
         timeline = new Timeline(new KeyFrame(Duration.millis(20), event -> {
             if (!paused) {
                 if (step()) {
-                    openList.forEach(c -> c.setFill(Color.rgb(255, 255, 0)));
+                    openList.forEach(c -> {
+                        c.setFill(Color.YELLOW);
+                        c.setStroke(Color.TRANSPARENT);
+                    });
                     closedList.forEach(c -> {
                         if (c != start)
-                            c.animate(Color.rgb(140, 220, 255), Color.rgb(220, 150, 255));
+                            c.animate();
                     });
                 } else {
                     drawPath();
@@ -73,9 +76,7 @@ public class Greedy extends SearchAlgo {
                 return false;
 
             List<CircleNode> adjacentCells = getAdjacentCells(current);
-            Iterator<CircleNode> iterator = adjacentCells.iterator();
-            while (iterator.hasNext()) {
-                CircleNode adjacentCell = iterator.next();
+            for (CircleNode adjacentCell : adjacentCells) {
                 if (!closedList.contains(adjacentCell)) {
                     computeShortestCellDistance(current, adjacentCell);
                     if (!openList.contains(adjacentCell))
@@ -130,9 +131,9 @@ public class Greedy extends SearchAlgo {
 
         List<CircleNode> result = new ArrayList<>();
 
-        for (int i = 0; i < adjacentCells.length; i++) {
-            if (adjacentCells[i] != null)
-                result.add(adjacentCells[i]);
+        for (CircleNode adjacentCell : adjacentCells) {
+            if (adjacentCell != null && !adjacentCell.isObstacle())
+                result.add(adjacentCell);
         }
 
         return result;

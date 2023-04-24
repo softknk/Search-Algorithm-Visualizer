@@ -3,8 +3,7 @@ package gui;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -16,61 +15,46 @@ public class Main extends Application {
     private static final int GRID_X_CIRCLES = 48;
     private static final int GRID_Y_CIRCLES = 27;
     private static final int GRID_PADDING = 25;
-    private static final int CIRCLE_MARGIN = 2;
+    private static final double CIRCLE_MARGIN = 1.5;
 
     public static CircleNode[][] circles = new CircleNode[GRID_X_CIRCLES][GRID_Y_CIRCLES];
 
     public static SearchAlgo current;
 
+    public static CircleNode source, dest;
+
     @Override
     public void start(Stage primaryStage) {
         VBox vbox = new VBox();
 
-        HBox menu = new HBox();
-        Label l = new Label("Hallo Test");
-        l.setTextFill(Color.rgb(255, 255, 255));
-        menu.getChildren().add(l);
-        Button b = new Button("Hallo");
-        menu.getChildren().add(b);
-        menu.setSpacing(25);
-        menu.setBackground(new Background(new BackgroundFill(Color.rgb(65, 68, 80), CornerRadii.EMPTY, Insets.EMPTY)));
-        menu.setPadding(new Insets(10));
+        Menu.init_menu();
 
         GridPane gridPane = new GridPane();
-        // add nodes to the grid here
+        gridPane.setPadding(new Insets(GRID_PADDING));
 
         for (int i = 0; i < circles.length; i++) {
             for (int j = 0; j < circles[0].length; j++) {
                 circles[i][j] = new CircleNode(j, i);
-                circles[i][j].setStroke(Color.rgb(200, 200, 200));
-                circles[i][j].setFill(Color.rgb(40, 42, 54));
                 circles[i][j].setRadius(MIN_CIRCLE_RADIUS);
-
-                gridPane.setPadding(new Insets(GRID_PADDING));
-
                 GridPane.setMargin(circles[i][j], new Insets(CIRCLE_MARGIN));
-
                 gridPane.add(circles[i][j], i, j);
-
-                // set hgrow and vgrow constraints on the label
-                GridPane.setHgrow(circles[i][j], javafx.scene.layout.Priority.ALWAYS);
-                GridPane.setVgrow(circles[i][j], javafx.scene.layout.Priority.ALWAYS);
             }
         }
 
-        current = new AStar(circles[0][0], circles[30][16]);
-        circles[30][16].setFill(Color.BLACK);
+        vbox.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.S) {
+                current = new AStar(circles[0][0], circles[40][25]);
+                circles[40][25].setFill(Color.BLACK);
+                current.findPath();
+                System.out.println(circles[0][0].getRadius());
+                System.out.println(gridPane.getWidth());
+            }
+        });
 
         gridPane.setBackground(new Background(new BackgroundFill(Color.rgb(40, 42, 54), CornerRadii.EMPTY, Insets.EMPTY)));
 
         double minWidth = GRID_X_CIRCLES * MIN_CIRCLE_RADIUS * 2 + 2 * GRID_PADDING + GRID_X_CIRCLES * 2 * CIRCLE_MARGIN;
         double minHeight = GRID_Y_CIRCLES * MIN_CIRCLE_RADIUS * 2 + 2 * GRID_PADDING + GRID_Y_CIRCLES * 2 * CIRCLE_MARGIN;
-
-        menu.widthProperty().addListener((obs, oldVal, newVal) -> {
-            double spacing = newVal.doubleValue() / 20;
-            menu.setSpacing(spacing);
-            ((Button)menu.getChildren().get(1)).setPrefWidth(spacing * 2);
-        });
 
         primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
             primaryStage.setWidth(newVal.doubleValue());
@@ -80,7 +64,6 @@ public class Main extends Application {
             w -= GRID_X_CIRCLES * 2 * CIRCLE_MARGIN;
             double new_rad = (w / GRID_X_CIRCLES) / 2;
             new_rad /= 2;
-            new_rad *= 0.85;
             for (int i = 0; i < circles.length; i++)
             {
                 for (int j = 0; j < circles[0].length; j++)
@@ -98,7 +81,6 @@ public class Main extends Application {
             h -= GRID_Y_CIRCLES * 2 * CIRCLE_MARGIN;
             double new_rad = (h / GRID_Y_CIRCLES) / 2;
             new_rad /= 2;
-            new_rad *= 0.85;
             for (int i = 0; i < circles.length; i++)
             {
                 for (int j = 0; j < circles[0].length; j++)
@@ -114,7 +96,7 @@ public class Main extends Application {
         gridPane.prefWidthProperty().bind(vbox.widthProperty());
         gridPane.prefHeightProperty().bind(vbox.heightProperty());
 
-        vbox.getChildren().add(menu);
+        vbox.getChildren().add(Menu.getMenu());
         vbox.getChildren().add(gridPane);
         vbox.setBackground(new Background(new BackgroundFill(Color.rgb(0, 0, 0), CornerRadii.EMPTY, Insets.EMPTY)));
 
@@ -127,7 +109,7 @@ public class Main extends Application {
         primaryStage.setMinHeight(minHeight);
         primaryStage.setMinWidth(minWidth);
 
-        current.findPath();
+        primaryStage.setTitle("Search Algorithm Visualizer");
 
         primaryStage.show();
     }
