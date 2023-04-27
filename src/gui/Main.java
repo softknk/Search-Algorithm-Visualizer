@@ -2,6 +2,7 @@ package gui;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
@@ -10,65 +11,59 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
-    private static final int MIN_CIRCLE_RADIUS = 5;
-    private static final int MAX_CIRCLE_RADIUS = 10000;
-    private static final int GRID_X_CIRCLES = 48;
-    private static final int GRID_Y_CIRCLES = 27;
+    private static Data data;
+    public static GridPane gridPane;
+
     private static final int GRID_PADDING = 25;
-    private static final double CIRCLE_MARGIN = 1.5;
-
-    public static CircleNode[][] circles = new CircleNode[GRID_X_CIRCLES][GRID_Y_CIRCLES];
-
-    public static SearchAlgo current;
-
-    public static CircleNode source, dest;
+    private static double CIRCLE_MARGIN = 1.5;
 
     @Override
     public void start(Stage primaryStage) {
+        data = new Data(64, 36);
+
         VBox vbox = new VBox();
 
         Menu.init_menu();
 
-        GridPane gridPane = new GridPane();
+        gridPane = new GridPane();
         gridPane.setPadding(new Insets(GRID_PADDING));
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setBackground(new Background(new BackgroundFill(CircleNode.CIRCLE_FILL, CornerRadii.EMPTY, Insets.EMPTY)));
 
-        for (int i = 0; i < circles.length; i++) {
-            for (int j = 0; j < circles[0].length; j++) {
-                circles[i][j] = new CircleNode(j, i);
-                circles[i][j].setRadius(MIN_CIRCLE_RADIUS);
-                GridPane.setMargin(circles[i][j], new Insets(CIRCLE_MARGIN));
-                gridPane.add(circles[i][j], i, j);
+        for (int i = 0; i < data.num_horizontal_circles(); i++) {
+            for (int j = 0; j < data.num_vertical_circles(); j++) {
+                GridPane.setMargin(data.get_circle_node_at(i, j), new Insets(CIRCLE_MARGIN));
+                gridPane.add(data.get_circle_node_at(i, j), i, j);
             }
         }
 
-        vbox.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.S) {
-                current = new AStar(circles[0][0], circles[40][25]);
-                circles[40][25].setFill(Color.BLACK);
-                current.findPath();
-                System.out.println(circles[0][0].getRadius());
-                System.out.println(gridPane.getWidth());
-            }
-        });
+        /*
+        **************************************************************************
+         */
 
-        gridPane.setBackground(new Background(new BackgroundFill(Color.rgb(40, 42, 54), CornerRadii.EMPTY, Insets.EMPTY)));
+        int num_hor = data.num_horizontal_circles();
+        int num_vert = data.num_vertical_circles();
 
-        double minWidth = GRID_X_CIRCLES * MIN_CIRCLE_RADIUS * 2 + 2 * GRID_PADDING + GRID_X_CIRCLES * 2 * CIRCLE_MARGIN;
-        double minHeight = GRID_Y_CIRCLES * MIN_CIRCLE_RADIUS * 2 + 2 * GRID_PADDING + GRID_Y_CIRCLES * 2 * CIRCLE_MARGIN;
+        double minWidth = num_hor * CircleNode.MIN_RADIUS * 2 + 2 * GRID_PADDING + num_hor * 2 * CIRCLE_MARGIN;
+        double minHeight = num_vert * CircleNode.MIN_RADIUS * 2 + 2 * GRID_PADDING + num_vert * 2 * CIRCLE_MARGIN;
 
         primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
             primaryStage.setWidth(newVal.doubleValue());
             primaryStage.setHeight(primaryStage.getWidth() * (9/16.0));
             double w = primaryStage.getWidth();
             w -= GRID_PADDING * 2;
-            w -= GRID_X_CIRCLES * 2 * CIRCLE_MARGIN;
-            double new_rad = (w / GRID_X_CIRCLES) / 2;
+            w -= num_hor * 2 * CIRCLE_MARGIN;
+            double new_rad = (w / num_hor) / 2;
             new_rad /= 2;
-            for (int i = 0; i < circles.length; i++)
+
+            CIRCLE_MARGIN = new_rad * 0.1;
+
+            for (int i = 0; i < num_hor; i++)
             {
-                for (int j = 0; j < circles[0].length; j++)
+                for (int j = 0; j < num_vert; j++)
                 {
-                    circles[i][j].setRadius(new_rad);
+                    data.get_circle_node_at(i, j).setRadius(new_rad);
+                    GridPane.setMargin(data.get_circle_node_at(i, j), new Insets(CIRCLE_MARGIN));
                 }
             }
         });
@@ -78,19 +73,23 @@ public class Main extends Application {
             primaryStage.setWidth(primaryStage.getHeight() * (16/9.0));
             double h = primaryStage.getWidth();
             h -= GRID_PADDING * 2;
-            h -= GRID_Y_CIRCLES * 2 * CIRCLE_MARGIN;
-            double new_rad = (h / GRID_Y_CIRCLES) / 2;
+            h -= num_vert * 2 * CIRCLE_MARGIN;
+            double new_rad = (h / num_vert) / 2;
             new_rad /= 2;
-            for (int i = 0; i < circles.length; i++)
+
+            CIRCLE_MARGIN = new_rad * 0.1;
+
+            for (int i = 0; i < num_hor; i++)
             {
-                for (int j = 0; j < circles[0].length; j++)
+                for (int j = 0; j < num_vert; j++)
                 {
-                    circles[i][j].setRadius(new_rad);
+                    data.get_circle_node_at(i, j).setRadius(new_rad);
+                    GridPane.setMargin(data.get_circle_node_at(i, j), new Insets(CIRCLE_MARGIN));
                 }
             }
         });
 
-        vbox.prefWidthProperty().bind(primaryStage.widthProperty());
+        vbox.prefWidthProperty().bind(primaryStage.widthProperty().subtract(100));
         vbox.prefHeightProperty().bind(primaryStage.heightProperty());
 
         gridPane.prefWidthProperty().bind(vbox.widthProperty());
@@ -100,11 +99,8 @@ public class Main extends Application {
         vbox.getChildren().add(gridPane);
         vbox.setBackground(new Background(new BackgroundFill(Color.rgb(0, 0, 0), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Scene scene = new Scene(vbox, minWidth + 150, minHeight + 150);
+        Scene scene = new Scene(vbox, minWidth, minHeight);
         primaryStage.setScene(scene);
-
-        primaryStage.setMaxWidth(GRID_X_CIRCLES * MAX_CIRCLE_RADIUS * 2 + 2 * GRID_PADDING + GRID_X_CIRCLES * 2 * CIRCLE_MARGIN);
-        primaryStage.setMaxHeight(GRID_Y_CIRCLES * MAX_CIRCLE_RADIUS * 2 + 2 * GRID_PADDING + GRID_Y_CIRCLES * 2 * CIRCLE_MARGIN);
 
         primaryStage.setMinHeight(minHeight);
         primaryStage.setMinWidth(minWidth);
@@ -112,6 +108,10 @@ public class Main extends Application {
         primaryStage.setTitle("Search Algorithm Visualizer");
 
         primaryStage.show();
+    }
+
+    public static Data getData() {
+        return data;
     }
 
     public static void main(String[] args) {

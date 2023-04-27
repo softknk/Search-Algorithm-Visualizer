@@ -16,31 +16,71 @@ public class Menu {
     public static boolean source_selection;
     public static boolean dest_selection;
 
+    public static Button clean;
+    public static Button pause;
+
+    public static Button source_selection_button;
+    public static Button dest_selection_button;
+    public static Button reset;
+    public static Button rand_obstacles;
+
     public static void init_menu() {
-        Label l = new Label("Hallo Test");
-        l.setTextFill(Color.rgb(255, 255, 255));
-        menu.getChildren().add(l);
-        Button b = new Button("Hallo");
-        menu.getChildren().add(b);
+        Button start_vis = new Button("Visualize");
+        menu.getChildren().add(start_vis);
+
+        rand_obstacles = new Button("Random obstacles");
+        menu.getChildren().add(rand_obstacles);
+
         menu.setSpacing(25);
         menu.setBackground(new Background(new BackgroundFill(Color.rgb(65, 68, 80), CornerRadii.EMPTY, Insets.EMPTY)));
-        menu.setPadding(new Insets(10));
+        menu.setPadding(new Insets(15));
 
-        Button source_selection = new Button("Source Selection");
-        Button dest_selection = new Button("Destination Selection");
+        source_selection_button = new Button("Source Selection");
+        dest_selection_button = new Button("Destination Selection");
 
-        source_selection.setOnAction(event -> {
+        clean = new Button("Clean");
+
+        reset = new Button("Reset");
+        pause = new Button("Pause");
+
+
+        reset.setOnAction(event -> {
+            Main.getData().reset();
+        });
+
+        source_selection_button.setOnAction(event -> {
             setSourceSelection(true);
             setDestSelection(false);
         });
 
-        dest_selection.setOnAction(event -> {
+        dest_selection_button.setOnAction(event -> {
             setDestSelection(true);
             setSourceSelection(false);
         });
 
-        menu.getChildren().add(source_selection);
-        menu.getChildren().add(dest_selection);
+        start_vis.setOnAction(event -> {
+            boolean visualize = Main.getData().visualize();
+            if (visualize)
+                disable_menu_actions();
+        });
+
+        clean.setOnAction(event -> {
+            Main.getData().clean();
+        });
+
+        pause.setOnAction(event -> {
+            Main.getData().change_vis_pause_status();
+        });
+
+        rand_obstacles.setOnAction(event -> {
+            Main.getData().random_obstacles();
+        });
+
+        menu.getChildren().add(source_selection_button);
+        menu.getChildren().add(dest_selection_button);
+        menu.getChildren().add(clean);
+        menu.getChildren().add(reset);
+        menu.getChildren().add(pause);
 
         menu.widthProperty().addListener((obs, oldVal, newVal) -> {
             double spacing = newVal.doubleValue() / 20;
@@ -48,6 +88,23 @@ public class Menu {
             ((Button)menu.getChildren().get(1)).setPrefWidth(spacing * 2);
         });
     }
+
+    public static void disable_menu_actions() {
+        source_selection_button.setDisable(true);
+        dest_selection_button.setDisable(true);
+        clean.setDisable(true);
+        reset.setDisable(true);
+        rand_obstacles.setDisable(true);
+    }
+
+    public static void enable_menu_actions() {
+        source_selection_button.setDisable(false);
+        dest_selection_button.setDisable(false);
+        clean.setDisable(false);
+        reset.setDisable(false);
+        rand_obstacles.setDisable(false);
+    }
+
     public static HBox getMenu() {
         return menu;
     }

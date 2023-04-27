@@ -1,6 +1,7 @@
 package gui;
 
 import javafx.animation.KeyFrame;
+import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
@@ -14,8 +15,7 @@ public class Greedy extends SearchAlgo {
     private Timeline timeline;
 
     public Greedy(CircleNode start, CircleNode target) {
-        this.start = start;
-        this.target = target;
+        super(start, target);
 
         openList = new ArrayList<>();
         closedList = new HashSet<>();
@@ -23,16 +23,6 @@ public class Greedy extends SearchAlgo {
 
     @Override
     public void findPath() {
-        if (start != null && target != null)
-            _findPath();
-    }
-
-    @Override
-    public int costs(CircleNode source) {
-        return (Math.abs(target.row - source.row) + Math.abs(target.col - source.col));
-    }
-
-    private void _findPath() {
         openList.clear();
         closedList.clear();
 
@@ -44,28 +34,50 @@ public class Greedy extends SearchAlgo {
             if (!paused) {
                 if (step()) {
                     openList.forEach(c -> {
-                        c.setFill(Color.YELLOW);
-                        c.setStroke(Color.TRANSPARENT);
+                        if (c != target) {
+                            c.setFill(Color.YELLOW);
+                            c.setStroke(Color.TRANSPARENT);
+                        }
                     });
                     closedList.forEach(c -> {
                         if (c != start)
                             c.animate();
                     });
                 } else {
-                    drawPath();
-                    timeline.stop();
+
+                    // Create a PauseTransition for 3 seconds
+                    PauseTransition pause = new PauseTransition(Duration.seconds(2));
+
+                    // Set the event handler for the pause to resume the Timeline when the pause is complete
+                    pause.setOnFinished(finishedEvent -> {
+                        drawPath();
+                        timeline.stop();
+                    });
+
+                    pause.play();
                 }
             }
-
-            if (stopped) {
-                clean();
-                timeline.stop();
-            }
-
         }));
 
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
+    }
+
+    @Override
+    public int costs(CircleNode source) {
+        return (Math.abs(target.row - source.row) + Math.abs(target.col - source.col));
+    }
+
+    @Override
+    public void clean() {
+        openList.forEach(circleNode -> {
+            if (circleNode != Main.getData().get_source() && circleNode != Main.getData().get_destination())
+                circleNode.reset();
+        });
+        closedList.forEach(circleNode -> {
+            if (circleNode != Main.getData().get_source() && circleNode != Main.getData().get_destination())
+                circleNode.reset();
+        });
     }
 
     private boolean step() {
@@ -100,9 +112,7 @@ public class Greedy extends SearchAlgo {
 
     private CircleNode getCellWithLowestCosts() {
         CircleNode lowest = openList.get(0);
-        Iterator<CircleNode> iterator = openList.iterator();
-        while (iterator.hasNext()) {
-            CircleNode current = iterator.next();
+        for (CircleNode current : openList) {
             if (costs(current) < costs(lowest))
                 lowest = current;
         }
@@ -110,37 +120,10 @@ public class Greedy extends SearchAlgo {
     }
 
     private void initCells() {
-        for (int i = 0; i < Main.circles.length; i++) {
-            for (int j = 0; j < Main.circles[0].length; j++) {
-                Main.circles[i][j].setDistance(Integer.MAX_VALUE / 2);
+        for (int i = 0; i < Main.getData().num_horizontal_circles(); i++) {
+            for (int j = 0; j < Main.getData().num_vertical_circles(); j++) {
+                Main.getData().get_circle_node_at(i, j).setDistance(Integer.MAX_VALUE / 2);
             }
         }
-    }
-
-    public List<CircleNode> getAdjacentCells(CircleNode cell) {
-        CircleNode[] adjacentCells = new CircleNode[4];
-
-        if (cell.row - 1 >= 0)
-            adjacentCells[0] = Main.circles[cell.col][cell.row - 1];
-        if (cell.col + 1 < Main.circles.length)
-            adjacentCells[1] = Main.circles[cell.col + 1][cell.row];
-        if (cell.row + 1 < Main.circles[0].length)
-            adjacentCells[2] = Main.circles[cell.col][cell.row + 1];
-        if (cell.col - 1 >= 0)
-            adjacentCells[3] = Main.circles[cell.col - 1][cell.row];
-
-        List<CircleNode> result = new ArrayList<>();
-
-        for (CircleNode adjacentCell : adjacentCells) {
-            if (adjacentCell != null && !adjacentCell.isObstacle())
-                result.add(adjacentCell);
-        }
-
-        return result;
-    }
-
-    @Override
-    public void clean() {
-        return;
     }
 }

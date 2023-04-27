@@ -11,9 +11,11 @@ import javafx.util.Duration;
 public class CircleNode extends Circle {
 
     public static final Color CIRCLE_FILL = Color.rgb(40, 42, 54);
-    public static final Color CIRCLE_OBSTACLE_FILL = Color.rgb(200, 200, 200);
     public static final Color CIRCLE_STROKE = Color.rgb(200, 200, 200);
+    public static final Color CIRCLE_OBSTACLE_FILL = Color.rgb(200, 200, 200);
     public static final Color CIRCLE_OBSTACLE_STROKE = Color.rgb(200, 200, 200);
+
+    public static final double MIN_RADIUS = 5.0;
 
     public int row;
     public int col;
@@ -39,18 +41,10 @@ public class CircleNode extends Circle {
 
         setOnMouseClicked(event -> {
             if (Menu.source_selection) {
-                if (Main.source != null)
-                    Main.source.setFill(CIRCLE_FILL);
-                Main.source = this;
-                setObstacle(false);
-                setFill(Color.YELLOW);
+                Main.getData().source_selection(this);
                 Menu.setSourceSelection(false);
             } else if (Menu.dest_selection) {
-                if (Main.dest != null)
-                    Main.dest.setFill(CIRCLE_FILL);
-                Main.dest = this;
-                setObstacle(false);
-                setFill(Color.ORANGE);
+                Main.getData().destination_selection(this);
                 Menu.setDestSelection(false);
             } else {
                 setObstacle(!isObstacle);
@@ -69,9 +63,9 @@ public class CircleNode extends Circle {
             setStroke(Color.WHITE);
             double RADIUS = getRadius();
             setRadius(getRadius() / 4);
-            animation = new Timeline(new KeyFrame(Duration.millis(35), event -> {
-                if (getRadius() <= RADIUS)
-                    setRadius(getRadius() + 0.2);
+            animation = new Timeline(new KeyFrame(Duration.millis(time_per_duration(getRadius(), 0.01, 300)), event -> {
+                if (getRadius() <= RADIUS && !Main.getData().get_current().paused)
+                    setRadius(getRadius() + 0.01);
                 else {
                     setRadius(RADIUS);
                     setFill(Color.rgb(116, 46, 255));
@@ -82,6 +76,19 @@ public class CircleNode extends Circle {
             animation.play();
             animationRunning = true;
         }
+    }
+
+    private static double time_per_duration(double radius, double rate, double animation_time) {
+        return animation_time / (radius / rate);
+    }
+
+    public void reset() {
+        setObstacle(false);
+        setFill(CIRCLE_FILL);
+        setStroke(CIRCLE_STROKE);
+        animationRunning = false;
+        prev = null;
+        distance = 0;
     }
 
     public int getDistance() {
@@ -111,8 +118,12 @@ public class CircleNode extends Circle {
             setFill(CIRCLE_OBSTACLE_FILL);
             setStroke(CIRCLE_OBSTACLE_STROKE);
         } else {
-            setFill(Color.TRANSPARENT);
+            setFill(CIRCLE_FILL);
             setStroke(CIRCLE_STROKE);
         }
+    }
+
+    public void setAnimationRunning(boolean animationRunning) {
+        this.animationRunning = animationRunning;
     }
 }
