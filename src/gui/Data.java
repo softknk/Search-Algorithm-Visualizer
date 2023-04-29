@@ -1,27 +1,31 @@
 package gui;
 
 import javafx.scene.paint.Color;
+import model.*;
+import model.maze_gen.PrimsAlgorithm;
 
 public class Data {
 
-    private final int num_horizontal_circles;
-    private final int num_vertical_circles;
-    private final CircleNode[][] circles;
+    private final int num_rows;
+    private final int num_columns;
+    private final CircleNode[][] nodes;
     private SearchAlgo current;
     private CircleNode source, dest;
 
-    public Data(final int num_horizontal_circles, final int num_vertical_circles) {
+    private String curr_algo;
 
-        this.num_horizontal_circles = num_horizontal_circles;
-        this.num_vertical_circles = num_vertical_circles;
+    public Data(final int num_rows, final int num_columns) {
+
+        this.num_rows = num_rows;
+        this.num_columns = num_columns;
 
         // init circles data structure
-        circles = new CircleNode[num_horizontal_circles][num_vertical_circles];
+        nodes = new CircleNode[num_rows][num_columns];
 
-        for (int i = 0; i < num_horizontal_circles; i++) {
-            for (int j = 0; j < num_vertical_circles; j++) {
-                circles[i][j] = new CircleNode(j, i);
-                circles[i][j].setRadius(CircleNode.MIN_RADIUS);
+        for (int i = 0; i < num_rows; i++) {
+            for (int j = 0; j < num_columns; j++) {
+                nodes[i][j] = new CircleNode(i, j);
+                nodes[i][j].setRadius(CircleNode.MIN_RADIUS);
             }
         }
     }
@@ -29,10 +33,24 @@ public class Data {
     public boolean visualize() {
         if (source != null && dest != null) {
             if (current != null) {
-                if (!current.paused)
+                if (current.isRunning())
                     return false;
             }
-            current = new AStar(source, dest);
+            if (curr_algo == null)
+                return false;
+            switch (curr_algo) {
+                case "A*":
+                    current = new AStar(source, dest);
+                    break;
+                case "Dijkstra":
+                    current = new Dijkstra(source, dest);
+                    break;
+                case "Greedy":
+                    current = new Greedy(source, dest);
+                    break;
+                default:
+                    throw new RuntimeException("ERROR: Algo not available");
+            }
             current.findPath();
             return true;
         } else {
@@ -45,10 +63,10 @@ public class Data {
         CircleNode source = this.source;
         CircleNode dest = this.dest;
         reset();
-        for (int i = 0; i < num_horizontal_circles; i++) {
-            for (int j = 0; j < num_vertical_circles; j++) {
+        for (int i = 0; i < num_rows; i++) {
+            for (int j = 0; j < num_columns; j++) {
                 if (Math.random() < obstacle_probability)
-                    circles[i][j].setObstacle(true);
+                    nodes[i][j].setObstacle();
             }
         }
         // restore source and destination nodes
@@ -56,10 +74,41 @@ public class Data {
         destination_selection(dest);
     }
 
+    public void maze() {
+        reset();
+
+        PrimsAlgorithm.generate_maze(nodes);
+
+        // border
+        for (int i = 0; i < num_rows; i++) {
+            for (int j = 0; j < num_columns; j++) {
+                if (i == 0 || j == 0 || i == num_rows - 1 || j == num_columns - 1)
+                    nodes[i][j].setObstacle();
+            }
+        }
+    }
+
+    public void circle_border_handle() {
+        boolean is_stroke = nodes[0][0].getStroke() != null;
+
+        for (int i = 0; i < num_rows; i++) {
+            for (int j = 0; j < num_columns; j++) {
+                CircleNode node = nodes[i][j];
+
+                if (is_stroke)
+                    node.setStroke(null);
+                else
+                    node.setStroke(node.isObstacle() ? CircleNode.CIRCLE_OBSTACLE_STROKE : CircleNode.CIRCLE_STROKE);
+
+                //      node.setRadius(is_stroke ? node.getRadius() + CircleNode.STROKE_WIDTH : node.getRadius() - CircleNode.STROKE_WIDTH);
+            }
+        }
+    }
+
     public void reset() {
-        for (int i = 0; i < num_horizontal_circles; i++) {
-            for (int j = 0; j < num_vertical_circles; j++) {
-                circles[i][j].reset();
+        for (int i = 0; i < num_rows; i++) {
+            for (int j = 0; j < num_columns; j++) {
+                nodes[i][j].reset();
             }
         }
         source = null;
@@ -86,8 +135,14 @@ public class Data {
             this.source.reset();
 
         this.source = source;
-        source.setObstacle(false);
-        source.setFill(Color.ORANGE);
+        source.setMovable();
+        source.setFill(Color.rgb(227, 172, 86));
+        source.setStroke(Color.WHITE);
+    }
+
+    public void update_curr_algo(String algo) {
+        // check if algo is correct and available
+        this.curr_algo = algo;
     }
 
     public void destination_selection(CircleNode dest) {
@@ -98,21 +153,22 @@ public class Data {
             this.dest.reset();
 
         this.dest = dest;
-        dest.setObstacle(false);
-        dest.setFill(Color.DARKCYAN);
+        dest.setMovable();
+        dest.setFill(Color.rgb(52, 69, 140));
+        dest.setStroke(Color.WHITE);
     }
 
-    public int num_horizontal_circles() {
-        return num_horizontal_circles;
+    public int num_rows() {
+        return num_rows;
     }
 
-    public int num_vertical_circles() {
-        return num_vertical_circles;
+    public int num_columns() {
+        return num_columns;
     }
 
     public CircleNode get_circle_node_at(int row, int col) {
-        if (row >= 0 && row < num_horizontal_circles && col >= 0 && col < num_vertical_circles)
-            return circles[row][col];
+        if (row >= 0 && row < num_rows && col >= 0 && col < num_columns)
+            return nodes[row][col];
         else
             throw new RuntimeException("Trying to access non existing circle node at: (" + row + ", " + col + ")");
     }

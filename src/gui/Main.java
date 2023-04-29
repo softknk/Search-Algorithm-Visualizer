@@ -4,22 +4,22 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import model.CircleNode;
 
 public class Main extends Application {
 
     private static Data data;
     public static GridPane gridPane;
 
-    private static final int GRID_PADDING = 25;
-    private static double CIRCLE_MARGIN = 1.5;
+    private static final int GRID_PADDING = 20;
+    private static double CIRCLE_MARGIN = 2;
 
     @Override
     public void start(Stage primaryStage) {
-        data = new Data(64, 36);
+        data = new Data(45, 70);
 
         VBox vbox = new VBox();
 
@@ -30,39 +30,35 @@ public class Main extends Application {
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setBackground(new Background(new BackgroundFill(CircleNode.CIRCLE_FILL, CornerRadii.EMPTY, Insets.EMPTY)));
 
-        for (int i = 0; i < data.num_horizontal_circles(); i++) {
-            for (int j = 0; j < data.num_vertical_circles(); j++) {
+        for (int i = 0; i < data.num_rows(); i++) {
+            for (int j = 0; j < data.num_columns(); j++) {
                 GridPane.setMargin(data.get_circle_node_at(i, j), new Insets(CIRCLE_MARGIN));
-                gridPane.add(data.get_circle_node_at(i, j), i, j);
+                gridPane.add(data.get_circle_node_at(i, j), j, i);
             }
         }
 
-        /*
-        **************************************************************************
-         */
+        int num_rows = data.num_rows();
+        int num_cols = data.num_columns();
 
-        int num_hor = data.num_horizontal_circles();
-        int num_vert = data.num_vertical_circles();
-
-        double minWidth = num_hor * CircleNode.MIN_RADIUS * 2 + 2 * GRID_PADDING + num_hor * 2 * CIRCLE_MARGIN;
-        double minHeight = num_vert * CircleNode.MIN_RADIUS * 2 + 2 * GRID_PADDING + num_vert * 2 * CIRCLE_MARGIN;
+        double minWidth = num_cols * CircleNode.MIN_RADIUS * 2 + 2 * GRID_PADDING + num_cols * 2 * CIRCLE_MARGIN;
+        double minHeight = num_rows * CircleNode.MIN_RADIUS * 2 + 2 * GRID_PADDING + num_rows * 2 * CIRCLE_MARGIN;
 
         primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
             primaryStage.setWidth(newVal.doubleValue());
             primaryStage.setHeight(primaryStage.getWidth() * (9/16.0));
-            double w = primaryStage.getWidth();
-            w -= GRID_PADDING * 2;
-            w -= num_hor * 2 * CIRCLE_MARGIN;
-            double new_rad = (w / num_hor) / 2;
-            new_rad /= 2;
 
-            CIRCLE_MARGIN = new_rad * 0.1;
+            double cell_size = primaryStage.getWidth() / data.num_columns();
+            double diameter = cell_size - 2 * CIRCLE_MARGIN - CircleNode.CIRCLE_STROKE_WIDTH;
+            double r = diameter / 2.0;
+            r *= 0.85;
 
-            for (int i = 0; i < num_hor; i++)
+            CIRCLE_MARGIN = r * 0.1;
+
+            for (int i = 0; i < num_rows; i++)
             {
-                for (int j = 0; j < num_vert; j++)
+                for (int j = 0; j < num_cols; j++)
                 {
-                    data.get_circle_node_at(i, j).setRadius(new_rad);
+                    data.get_circle_node_at(i, j).setRadius(r);
                     GridPane.setMargin(data.get_circle_node_at(i, j), new Insets(CIRCLE_MARGIN));
                 }
             }
@@ -71,19 +67,20 @@ public class Main extends Application {
         primaryStage.heightProperty().addListener((obs, oldVal, newVal) -> {
             primaryStage.setHeight(newVal.doubleValue());
             primaryStage.setWidth(primaryStage.getHeight() * (16/9.0));
-            double h = primaryStage.getWidth();
-            h -= GRID_PADDING * 2;
-            h -= num_vert * 2 * CIRCLE_MARGIN;
-            double new_rad = (h / num_vert) / 2;
-            new_rad /= 2;
+            primaryStage.setHeight(primaryStage.getHeight());
 
-            CIRCLE_MARGIN = new_rad * 0.1;
+            double cell_size = primaryStage.getWidth() / data.num_columns();
+            double diameter = cell_size - 2 * CIRCLE_MARGIN - CircleNode.CIRCLE_STROKE_WIDTH;
+            double r = diameter / 2.0;
+            r *= 0.85;
 
-            for (int i = 0; i < num_hor; i++)
+            CIRCLE_MARGIN = r * 0.1;
+
+            for (int i = 0; i < num_rows; i++)
             {
-                for (int j = 0; j < num_vert; j++)
+                for (int j = 0; j < num_cols; j++)
                 {
-                    data.get_circle_node_at(i, j).setRadius(new_rad);
+                    data.get_circle_node_at(i, j).setRadius(r);
                     GridPane.setMargin(data.get_circle_node_at(i, j), new Insets(CIRCLE_MARGIN));
                 }
             }
@@ -118,4 +115,3 @@ public class Main extends Application {
         launch(args);
     }
 }
-

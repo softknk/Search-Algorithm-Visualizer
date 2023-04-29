@@ -1,5 +1,6 @@
-package gui;
+package model;
 
+import gui.Main;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -35,13 +36,13 @@ public class Dijkstra extends SearchAlgo {
                 if (step()) {
                     openList.forEach(c -> {
                         if (c != target) {
-                            c.setFill(Color.YELLOW);
-                            c.setStroke(Color.TRANSPARENT);
+                            c.setFill(Color.rgb(59, 190, 255));
+                            c.setStroke(CircleNode.CIRCLE_STROKE);
                         }
                     });
                     closedList.forEach(c -> {
                         if (c != start)
-                            c.animate();
+                            c.evaluated_animation();
                     });
                 } else {
 
@@ -71,7 +72,7 @@ public class Dijkstra extends SearchAlgo {
     @Override
     public void clean() {
         openList.forEach(circleNode -> {
-            if (circleNode != data.get_source() && circleNode != data.get_destination())
+            if (circleNode != Main.getData().get_source() && circleNode != Main.getData().get_destination())
                 circleNode.reset();
         });
         closedList.forEach(circleNode -> {
@@ -87,7 +88,7 @@ public class Dijkstra extends SearchAlgo {
             if (current == target)
                 return false;
 
-            List<CircleNode> adjacentCells = getAdjacentCells(current);
+            List<CircleNode> adjacentCells = adjacent_nodes(current);
             for (CircleNode adjacentCell : adjacentCells) {
                 if (!closedList.contains(adjacentCell)) {
                     computeShortestCellDistance(current, adjacentCell);
@@ -120,9 +121,9 @@ public class Dijkstra extends SearchAlgo {
     }
 
     private void initCells() {
-        for (int i = 0; i < data.num_horizontal_circles(); i++) {
-            for (int j = 0; j < data.num_vertical_circles(); j++) {
-                data.get_circle_node_at(i, j).setDistance(Integer.MAX_VALUE / 2);
+        for (int i = 0; i < Main.getData().num_rows(); i++) {
+            for (int j = 0; j < Main.getData().num_columns(); j++) {
+                Main.getData().get_circle_node_at(i, j).setDistance(Integer.MAX_VALUE / 2);
             }
         }
     }

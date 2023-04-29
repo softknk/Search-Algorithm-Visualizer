@@ -1,17 +1,13 @@
-package gui;
+package model;
 
+import gui.Data;
+import gui.Main;
+import gui.Menu;
+import javafx.animation.FillTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.geometry.Point2D;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.RadialGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 import javafx.util.Duration;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,10 +37,12 @@ public abstract class SearchAlgo {
         tmp[0] = tmp[0].getPrev();
 
         Timeline[] timelines = new Timeline[]{new Timeline()};
-        timelines[0] = new Timeline(new KeyFrame(Duration.millis(50), event -> {
+        timelines[0] = new Timeline(new KeyFrame(Duration.millis(40), event -> {
             if (!paused) {
                 if (tmp[0].getPrev() != null) {
-                    tmp[0].setFill(Color.BLACK);
+
+                    tmp[0].path_node_animation();
+
                     tmp[0] = tmp[0].getPrev();
                 } else {
                     timelines[0].stop();
@@ -57,23 +55,24 @@ public abstract class SearchAlgo {
         timelines[0].play();
     }
 
-    public List<CircleNode> getAdjacentCells(CircleNode cell) {
-        CircleNode[] adjacentCells = new CircleNode[4];
+    public List<CircleNode> adjacent_nodes(CircleNode node) {
+        CircleNode[] adj_nodes = new CircleNode[4];
 
-        if (cell.row - 1 >= 0)
-            adjacentCells[0] = Main.getData().get_circle_node_at(cell.col, cell.row - 1);
-        if (cell.col + 1 < Main.getData().num_horizontal_circles())
-            adjacentCells[1] = Main.getData().get_circle_node_at(cell.col + 1, cell.row);
-        if (cell.row + 1 < Main.getData().num_vertical_circles())
-            adjacentCells[2] = Main.getData().get_circle_node_at(cell.col, cell.row + 1);
-        if (cell.col - 1 >= 0)
-            adjacentCells[3] = Main.getData().get_circle_node_at(cell.col - 1, cell.row);
+        if (node.row + 1 < Main.getData().num_rows())
+            adj_nodes[0] = Main.getData().get_circle_node_at(node.row + 1, node.col);
+        if (node.row - 1 >= 0)
+            adj_nodes[1] = Main.getData().get_circle_node_at(node.row - 1, node.col);
+
+        if (node.col + 1 < Main.getData().num_columns())
+            adj_nodes[2] = Main.getData().get_circle_node_at(node.row, node.col + 1);
+        if (node.col - 1 >= 0)
+            adj_nodes[3] = Main.getData().get_circle_node_at(node.row, node.col - 1);
 
         List<CircleNode> result = new ArrayList<>();
 
-        for (CircleNode adjacentCell : adjacentCells) {
-            if (adjacentCell != null && !adjacentCell.isObstacle())
-                result.add(adjacentCell);
+        for (CircleNode adj_node : adj_nodes) {
+            if (adj_node != null && adj_node.isMovable())
+                result.add(adj_node);
         }
 
         return result;
@@ -83,8 +82,8 @@ public abstract class SearchAlgo {
         paused = true;
     }
 
-    public boolean isPaused() {
-        return paused;
+    public boolean isRunning() {
+        return !paused;
     }
 
     public void setPaused(boolean paused) {

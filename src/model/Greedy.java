@@ -1,5 +1,6 @@
-package gui;
+package model;
 
+import gui.Main;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
 import javafx.animation.Timeline;
@@ -35,13 +36,13 @@ public class Greedy extends SearchAlgo {
                 if (step()) {
                     openList.forEach(c -> {
                         if (c != target) {
-                            c.setFill(Color.YELLOW);
-                            c.setStroke(Color.TRANSPARENT);
+                            c.setFill(Color.rgb(59, 190, 255));
+                            c.setStroke(CircleNode.CIRCLE_STROKE);
                         }
                     });
                     closedList.forEach(c -> {
                         if (c != start)
-                            c.animate();
+                            c.evaluated_animation();
                     });
                 } else {
 
@@ -87,7 +88,7 @@ public class Greedy extends SearchAlgo {
             if (current == target)
                 return false;
 
-            List<CircleNode> adjacentCells = getAdjacentCells(current);
+            List<CircleNode> adjacentCells = adjacent_nodes(current);
             for (CircleNode adjacentCell : adjacentCells) {
                 if (!closedList.contains(adjacentCell)) {
                     computeShortestCellDistance(current, adjacentCell);
@@ -120,8 +121,8 @@ public class Greedy extends SearchAlgo {
     }
 
     private void initCells() {
-        for (int i = 0; i < Main.getData().num_horizontal_circles(); i++) {
-            for (int j = 0; j < Main.getData().num_vertical_circles(); j++) {
+        for (int i = 0; i < Main.getData().num_rows(); i++) {
+            for (int j = 0; j < Main.getData().num_columns(); j++) {
                 Main.getData().get_circle_node_at(i, j).setDistance(Integer.MAX_VALUE / 2);
             }
         }

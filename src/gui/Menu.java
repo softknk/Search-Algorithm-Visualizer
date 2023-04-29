@@ -2,6 +2,7 @@ package gui;
 
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -43,6 +44,12 @@ public class Menu {
         reset = new Button("Reset");
         pause = new Button("Pause");
 
+        ComboBox<String> comboBox = new ComboBox<>();
+        comboBox.getItems().addAll("A*", "Dijkstra", "Greedy");
+
+        comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Main.getData().update_curr_algo(newValue);
+        });
 
         reset.setOnAction(event -> {
             Main.getData().reset();
@@ -76,6 +83,18 @@ public class Menu {
             Main.getData().random_obstacles();
         });
 
+        Button maze = new Button("Maze");
+        maze.setOnAction(event -> Main.getData().maze());
+
+        Button borders = new Button("Borders");
+
+        borders.setOnAction(event -> {
+            Main.getData().circle_border_handle();
+        });
+
+        menu.getChildren().add(comboBox);
+        menu.getChildren().add(borders);
+        menu.getChildren().add(maze);
         menu.getChildren().add(source_selection_button);
         menu.getChildren().add(dest_selection_button);
         menu.getChildren().add(clean);
