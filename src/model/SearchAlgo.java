@@ -1,12 +1,9 @@
 package model;
 
-import gui.Data;
 import gui.Main;
 import gui.Menu;
-import javafx.animation.FillTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -16,11 +13,10 @@ public abstract class SearchAlgo {
 
     protected CircleNode start, target;
     protected boolean paused;
-    protected Data data;
 
     public SearchAlgo(CircleNode start, CircleNode target) {
         if (start == null || target == null)
-            throw new RuntimeException("source or destination node not set properly.");
+            throw new RuntimeException("ERROR: source or destination node not set properly.");
 
         this.start = start;
         this.target = target;
@@ -30,7 +26,7 @@ public abstract class SearchAlgo {
 
     public abstract void findPath();
 
-    public abstract int costs(CircleNode source);
+    public abstract int costs(CircleNode node);
 
     public void drawPath() {
         final CircleNode[] tmp = {target};
@@ -40,13 +36,12 @@ public abstract class SearchAlgo {
         timelines[0] = new Timeline(new KeyFrame(Duration.millis(40), event -> {
             if (!paused) {
                 if (tmp[0].getPrev() != null) {
-
                     tmp[0].path_node_animation();
-
                     tmp[0] = tmp[0].getPrev();
                 } else {
                     timelines[0].stop();
                     setPaused(true);
+
                 }
             }
         }));
@@ -55,7 +50,7 @@ public abstract class SearchAlgo {
         timelines[0].play();
     }
 
-    public List<CircleNode> adjacent_nodes(CircleNode node) {
+    public List<CircleNode> adjacentNodes(CircleNode node) {
         CircleNode[] adj_nodes = new CircleNode[4];
 
         if (node.row + 1 < Main.getData().num_rows())

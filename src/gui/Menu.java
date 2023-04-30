@@ -17,32 +17,41 @@ public class Menu {
     public static boolean source_selection;
     public static boolean dest_selection;
 
-    public static Button clean;
-    public static Button pause;
+    public static MenuButton start_vis;
+    public static MenuButton clean;
+    public static MenuButton pause;
 
-    public static Button source_selection_button;
-    public static Button dest_selection_button;
-    public static Button reset;
-    public static Button rand_obstacles;
+    public static MenuButton source_selection_button;
+    public static MenuButton dest_selection_button;
+    public static MenuButton reset;
+    public static MenuButton rand_obstacles;
+
+    public static MenuButton maze;
 
     public static void init_menu() {
-        Button start_vis = new Button("Visualize");
-        menu.getChildren().add(start_vis);
-
-        rand_obstacles = new Button("Random obstacles");
-        menu.getChildren().add(rand_obstacles);
-
         menu.setSpacing(25);
         menu.setBackground(new Background(new BackgroundFill(Color.rgb(65, 68, 80), CornerRadii.EMPTY, Insets.EMPTY)));
-        menu.setPadding(new Insets(15));
+        menu.setPadding(new Insets(20));
 
-        source_selection_button = new Button("Source Selection");
-        dest_selection_button = new Button("Destination Selection");
+        rand_obstacles = new MenuButton("Random obstacles", actionEvent -> Main.getData().random_obstacles());
+        clean = new MenuButton("Clean", actionEvent -> Main.getData().clean());
+        reset = new MenuButton("Reset", actionEvent -> Main.getData().reset());
+        pause = new MenuButton("Pause", actionEvent -> Main.getData().change_vis_pause_status());
+        maze = new MenuButton("Maze", actionEvent -> Main.getData().maze());
 
-        clean = new Button("Clean");
-
-        reset = new Button("Reset");
-        pause = new Button("Pause");
+        start_vis = new MenuButton("Visualize", actionEvent -> {
+            boolean visualize = Main.getData().visualize();
+            if (visualize)
+                disable_menu_actions();
+        });
+        source_selection_button = new MenuButton("Source Selection", actionEvent -> {
+            setSourceSelection(true);
+            setDestSelection(false);
+        });
+        dest_selection_button = new MenuButton("Destination Selection", actionEvent -> {
+            setDestSelection(true);
+            setSourceSelection(false);
+        });
 
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.getItems().addAll("A*", "Dijkstra", "Greedy");
@@ -51,61 +60,21 @@ public class Menu {
             Main.getData().update_curr_algo(newValue);
         });
 
-        reset.setOnAction(event -> {
-            Main.getData().reset();
-        });
-
-        source_selection_button.setOnAction(event -> {
-            setSourceSelection(true);
-            setDestSelection(false);
-        });
-
-        dest_selection_button.setOnAction(event -> {
-            setDestSelection(true);
-            setSourceSelection(false);
-        });
-
-        start_vis.setOnAction(event -> {
-            boolean visualize = Main.getData().visualize();
-            if (visualize)
-                disable_menu_actions();
-        });
-
-        clean.setOnAction(event -> {
-            Main.getData().clean();
-        });
-
-        pause.setOnAction(event -> {
-            Main.getData().change_vis_pause_status();
-        });
-
-        rand_obstacles.setOnAction(event -> {
-            Main.getData().random_obstacles();
-        });
-
-        Button maze = new Button("Maze");
-        maze.setOnAction(event -> Main.getData().maze());
-
-        Button borders = new Button("Borders");
-
-        borders.setOnAction(event -> {
-            Main.getData().circle_border_handle();
-        });
-
+        menu.getChildren().add(start_vis);
         menu.getChildren().add(comboBox);
-        menu.getChildren().add(borders);
         menu.getChildren().add(maze);
+        menu.getChildren().add(rand_obstacles);
         menu.getChildren().add(source_selection_button);
         menu.getChildren().add(dest_selection_button);
         menu.getChildren().add(clean);
         menu.getChildren().add(reset);
         menu.getChildren().add(pause);
 
-        menu.widthProperty().addListener((obs, oldVal, newVal) -> {
+   /*     menu.widthProperty().addListener((obs, oldVal, newVal) -> {
             double spacing = newVal.doubleValue() / 20;
             menu.setSpacing(spacing);
-            ((Button)menu.getChildren().get(1)).setPrefWidth(spacing * 2);
-        });
+            ((MenuButton)menu.getChildren().get(1)).setPrefWidth(spacing * 2);
+        }); */
     }
 
     public static void disable_menu_actions() {

@@ -78,31 +78,6 @@ public class Data {
         reset();
 
         PrimsAlgorithm.generate_maze(nodes);
-
-        // border
-        for (int i = 0; i < num_rows; i++) {
-            for (int j = 0; j < num_columns; j++) {
-                if (i == 0 || j == 0 || i == num_rows - 1 || j == num_columns - 1)
-                    nodes[i][j].setObstacle();
-            }
-        }
-    }
-
-    public void circle_border_handle() {
-        boolean is_stroke = nodes[0][0].getStroke() != null;
-
-        for (int i = 0; i < num_rows; i++) {
-            for (int j = 0; j < num_columns; j++) {
-                CircleNode node = nodes[i][j];
-
-                if (is_stroke)
-                    node.setStroke(null);
-                else
-                    node.setStroke(node.isObstacle() ? CircleNode.CIRCLE_OBSTACLE_STROKE : CircleNode.CIRCLE_STROKE);
-
-                //      node.setRadius(is_stroke ? node.getRadius() + CircleNode.STROKE_WIDTH : node.getRadius() - CircleNode.STROKE_WIDTH);
-            }
-        }
     }
 
     public void reset() {
@@ -154,7 +129,7 @@ public class Data {
 
         this.dest = dest;
         dest.setMovable();
-        dest.setFill(Color.rgb(52, 69, 140));
+        dest.setFill(Color.rgb(50, 74, 182));
         dest.setStroke(Color.WHITE);
     }
 

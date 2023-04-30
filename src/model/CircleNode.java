@@ -12,13 +12,13 @@ import javafx.util.Duration;
 public class CircleNode extends Circle {
 
     public static final Color CIRCLE_FILL = Color.rgb(40, 42, 54);
-    public static final Color CIRCLE_STROKE = Color.rgb(65, 68, 80);
-    public static final Color CIRCLE_OBSTACLE_FILL = Color.rgb(94, 98, 115);
-    public static final Color CIRCLE_OBSTACLE_STROKE = Color.rgb(65, 68, 80);
+    public static final Color CIRCLE_STROKE = Color.rgb(81, 84, 101);
+    public static final Color CIRCLE_OBSTACLE_FILL = Color.rgb(81, 84, 101);
+    public static final Color CIRCLE_OBSTACLE_STROKE = Color.rgb(81, 84, 101);
 
     public static final double CIRCLE_STROKE_WIDTH = 2;
 
-    public static final double MIN_RADIUS = 4.0;
+    public static final double MIN_RADIUS = 2.0;
 
     public int row;
     public int col;
@@ -57,9 +57,23 @@ public class CircleNode extends Circle {
             }
         });
 
-        setOnMouseEntered(event -> {
-            if (event.isAltDown())
+        setOnMouseEntered(mouseEvent -> {
+            if (mouseEvent.isAltDown())
                 setObstacle();
+            if (isMovable() && (Menu.source_selection || Menu.dest_selection)) {
+                setStroke(Color.WHITE);
+                if (Menu.source_selection)
+                    setFill(Color.rgb(227, 172, 86));
+                else
+                    setFill(Color.rgb(50, 74, 182));
+            }
+        });
+
+        setOnMouseExited(mouseEvent -> {
+            if (isMovable() && (Menu.source_selection || Menu.dest_selection)) {
+                setStroke(CIRCLE_STROKE);
+                setFill(CIRCLE_FILL);
+            }
         });
     }
 
@@ -72,8 +86,7 @@ public class CircleNode extends Circle {
     public void evaluated_animation() {
         if (!animationRunning) {
             setFill(Color.rgb(59, 190, 255));
-            setStroke(Color.TRANSPARENT);
-            setStrokeWidth(0);
+            setStroke(null);
 
             FillTransition fill = new FillTransition();
             fill.setDuration(Duration.millis(1600));
@@ -83,6 +96,12 @@ public class CircleNode extends Circle {
             fill.setAutoReverse(true);
             fill.setCycleCount(1);
             fill.play();
+
+            // when the circle fill transition is finished the stroke gets activated
+            fill.setOnFinished(actionEvent -> {
+                setStroke(Color.rgb(109, 0, 181));
+                setStrokeWidth(CircleNode.CIRCLE_STROKE_WIDTH);
+            });
 
             double RADIUS = getRadius();
             setRadius(getRadius() / 4);
@@ -94,6 +113,7 @@ public class CircleNode extends Circle {
                     animation.stop();
                 }
             }));
+
             animation.setCycleCount(Timeline.INDEFINITE);
             animation.play();
 

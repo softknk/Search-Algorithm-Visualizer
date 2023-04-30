@@ -31,14 +31,14 @@ public class AStar extends SearchAlgo {
         start.setDistance(0);
         openList.add(start);
 
-        timeline = new Timeline(new KeyFrame(Duration.millis(20), event -> {
+        timeline = new Timeline(new KeyFrame(Duration.millis(10), event -> {
             if (!paused) {
                 if (step()) {
                     openList.forEach(c -> {
                         if (c != target) {
                             c.setFill(Color.rgb(59, 190, 255));
-                            c.setStrokeWidth(0);
-                            c.setStroke(Color.TRANSPARENT);
+                            c.setStroke(Color.rgb(59, 190, 255));
+                            c.setStrokeWidth(CircleNode.CIRCLE_STROKE_WIDTH);
                         }
                     });
                     closedList.forEach(c -> {
@@ -65,8 +65,8 @@ public class AStar extends SearchAlgo {
     }
 
     @Override
-    public int costs(CircleNode source) {
-        return source.getDistance() + heuristic(source, target);
+    public int costs(CircleNode node) {
+        return node.getDistance() + heuristic(node, target);
     }
 
     private int heuristic(CircleNode source, CircleNode target) {
@@ -92,7 +92,7 @@ public class AStar extends SearchAlgo {
             if (current == target)
                 return false;
 
-            List<CircleNode> adjacentCells = adjacent_nodes(current);
+            List<CircleNode> adjacentCells = adjacentNodes(current);
             for (CircleNode adjacentCell : adjacentCells) {
                 if (!closedList.contains(adjacentCell)) {
                     computeShortestCellDistance(current, adjacentCell);

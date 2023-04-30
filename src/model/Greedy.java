@@ -37,7 +37,8 @@ public class Greedy extends SearchAlgo {
                     openList.forEach(c -> {
                         if (c != target) {
                             c.setFill(Color.rgb(59, 190, 255));
-                            c.setStroke(CircleNode.CIRCLE_STROKE);
+                            c.setStroke(Color.rgb(59, 190, 255));
+                            c.setStrokeWidth(CircleNode.CIRCLE_STROKE_WIDTH);
                         }
                     });
                     closedList.forEach(c -> {
@@ -65,8 +66,8 @@ public class Greedy extends SearchAlgo {
     }
 
     @Override
-    public int costs(CircleNode source) {
-        return (Math.abs(target.row - source.row) + Math.abs(target.col - source.col));
+    public int costs(CircleNode node) {
+        return (Math.abs(target.row - node.row) + Math.abs(target.col - node.col));
     }
 
     @Override
@@ -88,7 +89,7 @@ public class Greedy extends SearchAlgo {
             if (current == target)
                 return false;
 
-            List<CircleNode> adjacentCells = adjacent_nodes(current);
+            List<CircleNode> adjacentCells = adjacentNodes(current);
             for (CircleNode adjacentCell : adjacentCells) {
                 if (!closedList.contains(adjacentCell)) {
                     computeShortestCellDistance(current, adjacentCell);

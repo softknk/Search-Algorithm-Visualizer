@@ -14,8 +14,8 @@ public class Main extends Application {
     private static Data data;
     public static GridPane gridPane;
 
-    private static final int GRID_PADDING = 20;
-    private static double CIRCLE_MARGIN = 2;
+    private static final int GRID_PADDING = 30;
+    private static double CIRCLE_MARGIN = 1;
 
     @Override
     public void start(Stage primaryStage) {
@@ -40,8 +40,8 @@ public class Main extends Application {
         int num_rows = data.num_rows();
         int num_cols = data.num_columns();
 
-        double minWidth = num_cols * CircleNode.MIN_RADIUS * 2 + 2 * GRID_PADDING + num_cols * 2 * CIRCLE_MARGIN;
-        double minHeight = num_rows * CircleNode.MIN_RADIUS * 2 + 2 * GRID_PADDING + num_rows * 2 * CIRCLE_MARGIN;
+        double minWidth = num_cols * (CircleNode.MIN_RADIUS + 5) * 2 + 2 * GRID_PADDING + num_cols * 2 * CIRCLE_MARGIN;
+        double minHeight = num_rows * (CircleNode.MIN_RADIUS + 5) * 2 + 2 * GRID_PADDING + num_rows * 2 * CIRCLE_MARGIN;
 
         primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
             primaryStage.setWidth(newVal.doubleValue());
@@ -52,14 +52,16 @@ public class Main extends Application {
             double r = diameter / 2.0;
             r *= 0.85;
 
-            CIRCLE_MARGIN = r * 0.1;
+            if (r >= CircleNode.MIN_RADIUS) {
+                CIRCLE_MARGIN = r * 0.1;
 
-            for (int i = 0; i < num_rows; i++)
-            {
-                for (int j = 0; j < num_cols; j++)
+                for (int i = 0; i < num_rows; i++)
                 {
-                    data.get_circle_node_at(i, j).setRadius(r);
-                    GridPane.setMargin(data.get_circle_node_at(i, j), new Insets(CIRCLE_MARGIN));
+                    for (int j = 0; j < num_cols; j++)
+                    {
+                        data.get_circle_node_at(i, j).setRadius(r);
+                        GridPane.setMargin(data.get_circle_node_at(i, j), new Insets(CIRCLE_MARGIN));
+                    }
                 }
             }
         });
@@ -74,19 +76,21 @@ public class Main extends Application {
             double r = diameter / 2.0;
             r *= 0.85;
 
-            CIRCLE_MARGIN = r * 0.1;
+            if (r >= CircleNode.MIN_RADIUS) {
+                CIRCLE_MARGIN = r * 0.1;
 
-            for (int i = 0; i < num_rows; i++)
-            {
-                for (int j = 0; j < num_cols; j++)
+                for (int i = 0; i < num_rows; i++)
                 {
-                    data.get_circle_node_at(i, j).setRadius(r);
-                    GridPane.setMargin(data.get_circle_node_at(i, j), new Insets(CIRCLE_MARGIN));
+                    for (int j = 0; j < num_cols; j++)
+                    {
+                        data.get_circle_node_at(i, j).setRadius(r);
+                        GridPane.setMargin(data.get_circle_node_at(i, j), new Insets(CIRCLE_MARGIN));
+                    }
                 }
             }
         });
 
-        vbox.prefWidthProperty().bind(primaryStage.widthProperty().subtract(100));
+        vbox.prefWidthProperty().bind(primaryStage.widthProperty());
         vbox.prefHeightProperty().bind(primaryStage.heightProperty());
 
         gridPane.prefWidthProperty().bind(vbox.widthProperty());
@@ -96,11 +100,7 @@ public class Main extends Application {
         vbox.getChildren().add(gridPane);
         vbox.setBackground(new Background(new BackgroundFill(Color.rgb(0, 0, 0), CornerRadii.EMPTY, Insets.EMPTY)));
 
-        Scene scene = new Scene(vbox, minWidth, minHeight);
-        primaryStage.setScene(scene);
-
-        primaryStage.setMinHeight(minHeight);
-        primaryStage.setMinWidth(minWidth);
+        primaryStage.setScene(new Scene(vbox, minWidth, minHeight));
 
         primaryStage.setTitle("Search Algorithm Visualizer");
 
