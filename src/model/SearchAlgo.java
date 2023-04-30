@@ -1,5 +1,6 @@
 package model;
 
+import gui.Constants;
 import gui.Main;
 import gui.Menu;
 import javafx.animation.KeyFrame;
@@ -33,7 +34,7 @@ public abstract class SearchAlgo {
         tmp[0] = tmp[0].getPrev();
 
         Timeline[] timelines = new Timeline[]{new Timeline()};
-        timelines[0] = new Timeline(new KeyFrame(Duration.millis(40), event -> {
+        timelines[0] = new Timeline(new KeyFrame(Duration.millis(Constants.DRAW_PATH_ANIM_SPEED), event -> {
             if (!paused) {
                 if (tmp[0].getPrev() != null) {
                     tmp[0].path_node_animation();
@@ -53,15 +54,15 @@ public abstract class SearchAlgo {
     public List<CircleNode> adjacentNodes(CircleNode node) {
         CircleNode[] adj_nodes = new CircleNode[4];
 
-        if (node.row + 1 < Main.getData().num_rows())
-            adj_nodes[0] = Main.getData().get_circle_node_at(node.row + 1, node.col);
-        if (node.row - 1 >= 0)
-            adj_nodes[1] = Main.getData().get_circle_node_at(node.row - 1, node.col);
+        if (node.row() + 1 < Main.getData().num_rows())
+            adj_nodes[0] = Main.getData().get_circle_node_at(node.row() + 1, node.column());
+        if (node.row() - 1 >= 0)
+            adj_nodes[1] = Main.getData().get_circle_node_at(node.row() - 1, node.column());
 
-        if (node.col + 1 < Main.getData().num_columns())
-            adj_nodes[2] = Main.getData().get_circle_node_at(node.row, node.col + 1);
-        if (node.col - 1 >= 0)
-            adj_nodes[3] = Main.getData().get_circle_node_at(node.row, node.col - 1);
+        if (node.column() + 1 < Main.getData().num_columns())
+            adj_nodes[2] = Main.getData().get_circle_node_at(node.row(), node.column() + 1);
+        if (node.column() - 1 >= 0)
+            adj_nodes[3] = Main.getData().get_circle_node_at(node.row(), node.column() - 1);
 
         List<CircleNode> result = new ArrayList<>();
 

@@ -7,15 +7,13 @@ import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import model.CircleNode;
 
 public class Main extends Application {
 
     private static Data data;
     public static GridPane gridPane;
 
-    private static final int GRID_PADDING = 30;
-    private static double CIRCLE_MARGIN = 1;
+    private static double CIRCLE_MARGIN = 1.2;
 
     @Override
     public void start(Stage primaryStage) {
@@ -26,9 +24,9 @@ public class Main extends Application {
         Menu.init_menu();
 
         gridPane = new GridPane();
-        gridPane.setPadding(new Insets(GRID_PADDING));
+        gridPane.setPadding(new Insets(Constants.GRID_PANE_PADDING));
         gridPane.setAlignment(Pos.CENTER);
-        gridPane.setBackground(new Background(new BackgroundFill(CircleNode.CIRCLE_FILL, CornerRadii.EMPTY, Insets.EMPTY)));
+        gridPane.setBackground(new Background(new BackgroundFill(Constants.CIRCLE_FILL, CornerRadii.EMPTY, Insets.EMPTY)));
 
         for (int i = 0; i < data.num_rows(); i++) {
             for (int j = 0; j < data.num_columns(); j++) {
@@ -40,19 +38,19 @@ public class Main extends Application {
         int num_rows = data.num_rows();
         int num_cols = data.num_columns();
 
-        double minWidth = num_cols * (CircleNode.MIN_RADIUS + 5) * 2 + 2 * GRID_PADDING + num_cols * 2 * CIRCLE_MARGIN;
-        double minHeight = num_rows * (CircleNode.MIN_RADIUS + 5) * 2 + 2 * GRID_PADDING + num_rows * 2 * CIRCLE_MARGIN;
+        double minWidth = num_cols * (Constants.CIRCLE_MIN_RADIUS + 5) * 2 + 2 * Constants.GRID_PANE_PADDING + num_cols * 2 * CIRCLE_MARGIN;
+        double minHeight = num_rows * (Constants.CIRCLE_MIN_RADIUS + 5) * 2 + 2 * Constants.GRID_PANE_PADDING + num_rows * 2 * CIRCLE_MARGIN;
 
         primaryStage.widthProperty().addListener((obs, oldVal, newVal) -> {
             primaryStage.setWidth(newVal.doubleValue());
             primaryStage.setHeight(primaryStage.getWidth() * (9/16.0));
 
             double cell_size = primaryStage.getWidth() / data.num_columns();
-            double diameter = cell_size - 2 * CIRCLE_MARGIN - CircleNode.CIRCLE_STROKE_WIDTH;
+            double diameter = cell_size - 2 * CIRCLE_MARGIN - Constants.CIRCLE_STROKE_WIDTH;
             double r = diameter / 2.0;
             r *= 0.85;
 
-            if (r >= CircleNode.MIN_RADIUS) {
+            if (r >= Constants.CIRCLE_MIN_RADIUS) {
                 CIRCLE_MARGIN = r * 0.1;
 
                 for (int i = 0; i < num_rows; i++)
@@ -72,11 +70,11 @@ public class Main extends Application {
             primaryStage.setHeight(primaryStage.getHeight());
 
             double cell_size = primaryStage.getWidth() / data.num_columns();
-            double diameter = cell_size - 2 * CIRCLE_MARGIN - CircleNode.CIRCLE_STROKE_WIDTH;
+            double diameter = cell_size - 2 * CIRCLE_MARGIN - Constants.CIRCLE_STROKE_WIDTH;
             double r = diameter / 2.0;
             r *= 0.85;
 
-            if (r >= CircleNode.MIN_RADIUS) {
+            if (r >= Constants.CIRCLE_MIN_RADIUS) {
                 CIRCLE_MARGIN = r * 0.1;
 
                 for (int i = 0; i < num_rows; i++)

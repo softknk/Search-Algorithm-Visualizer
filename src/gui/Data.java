@@ -25,7 +25,7 @@ public class Data {
         for (int i = 0; i < num_rows; i++) {
             for (int j = 0; j < num_columns; j++) {
                 nodes[i][j] = new CircleNode(i, j);
-                nodes[i][j].setRadius(CircleNode.MIN_RADIUS);
+                nodes[i][j].setRadius(Constants.CIRCLE_MIN_RADIUS);
             }
         }
     }
@@ -59,17 +59,22 @@ public class Data {
     }
 
     public void random_obstacles() {
-        double obstacle_probability = 0.3;
         CircleNode source = this.source;
         CircleNode dest = this.dest;
         reset();
         for (int i = 0; i < num_rows; i++) {
             for (int j = 0; j < num_columns; j++) {
-                if (Math.random() < obstacle_probability)
+                if (Math.random() < Constants.RAND_OBSTACLE_PROBABILITY)
                     nodes[i][j].setObstacle();
             }
         }
         // restore source and destination nodes
+        if (source != null)
+            source.setMovable();
+
+        if (dest != null)
+            dest.setMovable();
+
         source_selection(source);
         destination_selection(dest);
     }
@@ -109,6 +114,9 @@ public class Data {
         if (this.source != null)
             this.source.reset();
 
+        if (source.isObstacle())
+            return;
+
         this.source = source;
         source.setMovable();
         source.setFill(Color.rgb(227, 172, 86));
@@ -126,6 +134,9 @@ public class Data {
 
         if (this.dest != null)
             this.dest.reset();
+
+        if (dest.isObstacle())
+            return;
 
         this.dest = dest;
         dest.setMovable();

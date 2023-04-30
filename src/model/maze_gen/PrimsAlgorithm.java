@@ -37,8 +37,8 @@ public class PrimsAlgorithm {
             CircleNode parent = parents.get(rand_frontier);
             if (parent != null) {
                 if (parent.isMovable()) {
-                    int wall_row = (rand_frontier.row + parent.row) / 2;
-                    int wall_col= (rand_frontier.col + parent.col) / 2;
+                    int wall_row = (rand_frontier.row() + parent.row()) / 2;
+                    int wall_col= (rand_frontier.column() + parent.column()) / 2;
                     CircleNode wall_node = nodes[wall_row][wall_col];
                     wall_node.setMovable();
                 }
@@ -57,14 +57,14 @@ public class PrimsAlgorithm {
                                          Map<CircleNode, CircleNode> parents) {
         CircleNode[] adj_nodes = new CircleNode[4];
 
-        if (is_valid_pos(node.row, node.col - 2, nodes.length, nodes[0].length))
-            adj_nodes[0] = nodes[node.row][node.col - 2];
-        if (is_valid_pos(node.row, node.col + 2, nodes.length, nodes[0].length))
-            adj_nodes[1] = nodes[node.row][node.col + 2];
-        if (is_valid_pos(node.row - 2, node.col, nodes.length, nodes[0].length))
-            adj_nodes[2] = nodes[node.row - 2][node.col];
-        if (is_valid_pos(node.row + 2, node.col, nodes.length, nodes[0].length))
-            adj_nodes[3] = nodes[node.row + 2][node.col];
+        if (is_valid_pos(node.row(), node.column() - 2, nodes.length, nodes[0].length))
+            adj_nodes[0] = nodes[node.row()][node.column() - 2];
+        if (is_valid_pos(node.row(), node.column() + 2, nodes.length, nodes[0].length))
+            adj_nodes[1] = nodes[node.row()][node.column() + 2];
+        if (is_valid_pos(node.row() - 2, node.column(), nodes.length, nodes[0].length))
+            adj_nodes[2] = nodes[node.row() - 2][node.column()];
+        if (is_valid_pos(node.row() + 2, node.column(), nodes.length, nodes[0].length))
+            adj_nodes[3] = nodes[node.row() + 2][node.column()];
 
         for (int i = 0; i < adj_nodes.length; i++) {
             CircleNode adj = adj_nodes[i];

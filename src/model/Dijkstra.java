@@ -1,5 +1,6 @@
 package model;
 
+import gui.Constants;
 import gui.Main;
 import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
@@ -31,15 +32,12 @@ public class Dijkstra extends SearchAlgo {
         start.setDistance(0);
         openList.add(start);
 
-        timeline = new Timeline(new KeyFrame(Duration.millis(20), event -> {
+        timeline = new Timeline(new KeyFrame(Duration.millis(Constants.FIND_PATH_SPEED), event -> {
             if (!paused) {
                 if (step()) {
                     openList.forEach(c -> {
-                        if (c != target) {
-                            c.setFill(Color.rgb(59, 190, 255));
-                            c.setStroke(Color.rgb(59, 190, 255));
-                            c.setStrokeWidth(CircleNode.CIRCLE_STROKE_WIDTH);
-                        }
+                        if (c != target)
+                            c.node_found_animation();
                     });
                     closedList.forEach(c -> {
                         if (c != start)
