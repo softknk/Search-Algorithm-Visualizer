@@ -33,25 +33,25 @@ public class Menu {
         menu.setBackground(new Background(new BackgroundFill(Color.rgb(65, 68, 80), CornerRadii.EMPTY, Insets.EMPTY)));
         menu.setPadding(new Insets(20));
 
-        rand_obstacles = new MenuButton("Random obstacles", actionEvent -> Main.getData().random_obstacles());
-        clean = new MenuButton("Clean", actionEvent -> Main.getData().clean());
-        reset = new MenuButton("Reset", actionEvent -> Main.getData().reset());
-        pause = new MenuButton("Pause", actionEvent -> Main.getData().change_vis_pause_status());
-        maze = new MenuButton("Maze", actionEvent -> Main.getData().maze());
+        rand_obstacles = new MenuButton("Random obstacles", actionEvent -> Main.getData().random_obstacles(), 160);
+        clean = new MenuButton("Clean", actionEvent -> Main.getData().clean(), 130);
+        reset = new MenuButton("Reset", actionEvent -> Main.getData().reset(), 130);
+        pause = new MenuButton("Pause", actionEvent -> Main.getData().change_vis_pause_status(), 130);
+        maze = new MenuButton("Maze", actionEvent -> Main.getData().maze(), 130);
 
         start_vis = new MenuButton("Visualize", actionEvent -> {
             boolean visualize = Main.getData().visualize();
             if (visualize)
                 disable_menu_actions();
-        });
+        }, 130);
         source_selection_button = new MenuButton("Source Selection", actionEvent -> {
             setSourceSelection(true);
             setDestSelection(false);
-        });
+        }, 180);
         dest_selection_button = new MenuButton("Destination Selection", actionEvent -> {
             setDestSelection(true);
             setSourceSelection(false);
-        });
+        }, 180);
 
         ComboBox<String> comboBox = new ComboBox<>();
         comboBox.getItems().addAll("A*", "Dijkstra", "Greedy");

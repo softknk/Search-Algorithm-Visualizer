@@ -42,7 +42,6 @@ public abstract class SearchAlgo {
                 } else {
                     timelines[0].stop();
                     setPaused(true);
-
                 }
             }
         }));

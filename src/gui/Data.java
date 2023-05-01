@@ -24,7 +24,7 @@ public class Data {
 
         for (int i = 0; i < num_rows; i++) {
             for (int j = 0; j < num_columns; j++) {
-                nodes[i][j] = new CircleNode(i, j);
+                nodes[i][j] = new CircleNode(i, j, false);
                 nodes[i][j].setRadius(Constants.CIRCLE_MIN_RADIUS);
             }
         }

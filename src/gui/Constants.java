@@ -12,10 +12,12 @@ public interface Constants {
     Color SOURCE_SELECTION_FILL = Color.rgb(227, 172, 86);
     Color DEST_SELECTION_FILL = Color.rgb(50, 74, 182);
 
-    Color PATH_NODE_FILL = Color.rgb(209, 13, 75);
+    Color PATH_NODE_FILL = Color.rgb(86, 255, 43);
 
-    Color EVAL_ANIM_FROM_FILL = Color.rgb(109, 0, 181);
+    Color EVAL_ANIM_FROM_FILL = Color.rgb(216, 135, 255);
     Color EVAL_ANIM_TO_FILL = Color.rgb(48, 153, 206);
+
+    Color ANIM_END_FILL = Color.rgb(149, 10, 245);
 
     double CIRCLE_STROKE_WIDTH = 2;
 

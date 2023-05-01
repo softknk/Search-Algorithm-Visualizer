@@ -13,29 +13,25 @@ import javafx.util.Duration;
 
 public class CircleNode extends Circle {
 
-    private int row;
-    private int col;
-
+    private final int row;
+    private final int col;
+    private boolean obstacle;
     private int distance;
-
     private CircleNode prev;
-
-    private boolean isObstacle;
-
     private boolean animationRunning;
     private Timeline animation;
 
-    public CircleNode(int row, int col) {
+    public CircleNode(int row, int col, boolean obstacle) {
         this.row = row;
         this.col = col;
 
+        this.obstacle = obstacle;
+
+        setFill(Constants.CIRCLE_FILL);
         setStrokeWidth(Constants.CIRCLE_STROKE_WIDTH);
         setStroke(Constants.CIRCLE_STROKE);
-        setFill(Constants.CIRCLE_FILL);
 
-        this.isObstacle = false;
-
-        setOnMouseClicked(event -> {
+        setOnMouseClicked(mouseEvent -> {
             if (Menu.source_selection) {
                 Main.getData().source_selection(this);
                 Menu.setSourceSelection(false);
@@ -43,7 +39,7 @@ public class CircleNode extends Circle {
                 Main.getData().destination_selection(this);
                 Menu.setDestSelection(false);
             } else {
-                if (isObstacle)
+                if (obstacle)
                     setMovable();
                 else
                     setObstacle();
@@ -71,9 +67,8 @@ public class CircleNode extends Circle {
     }
 
     public void path_node_animation() {
-        setStroke(Color.WHITE);
-        setStrokeWidth(Constants.CIRCLE_STROKE_WIDTH);
         setFill(Constants.PATH_NODE_FILL);
+        setStroke(Color.WHITE);
     }
 
     public void node_found_animation() {
@@ -84,7 +79,7 @@ public class CircleNode extends Circle {
 
     public void evaluated_animation() {
         if (!animationRunning) {
-            setStroke(Constants.EVAL_ANIM_TO_FILL);
+            setStroke(Color.TRANSPARENT);
 
             FillTransition fill = new FillTransition();
             fill.setDuration(Duration.millis(Constants.CIRCLE_FILL_ANIM_SPEED));
@@ -95,12 +90,17 @@ public class CircleNode extends Circle {
             fill.setCycleCount(1);
             fill.play();
 
+            fill.setOnFinished(actionEvent -> {
+                setFill(Constants.ANIM_END_FILL);
+                setStroke(Constants.ANIM_END_FILL);
+            });
+
             double RADIUS = getRadius();
             setRadius(getRadius() / 4);
-            animation = new Timeline(new KeyFrame(Duration.millis(time_per_duration(getRadius(), 0.01, Constants.CIRCLE_ANIM_SPEED)), event -> {
-                if (getRadius() <= RADIUS && !Main.getData().get_current().paused)
+            animation = new Timeline(new KeyFrame(Duration.millis(Constants.CIRCLE_ANIM_SPEED / (getRadius() / 0.01)), event -> {
+                if (getRadius() <= RADIUS && !Main.getData().get_current().paused) {
                     setRadius(getRadius() + 0.01);
-                else {
+                } else {
                     setRadius(RADIUS);
                     animation.stop();
                 }
@@ -113,10 +113,6 @@ public class CircleNode extends Circle {
         }
     }
 
-    private static double time_per_duration(double radius, double rate, double animation_time) {
-        return animation_time / (radius / rate);
-    }
-
     public void reset() {
         setMovable();
         setFill(Constants.CIRCLE_FILL);
@@ -125,6 +121,24 @@ public class CircleNode extends Circle {
         animationRunning = false;
         prev = null;
         distance = 0;
+    }
+
+    public void setObstacle() {
+        this.obstacle = true;
+
+        setFill(Constants.CIRCLE_OBSTACLE_FILL);
+        setStroke(Constants.CIRCLE_OBSTACLE_STROKE);
+    }
+
+    public void setMovable() {
+        this.obstacle = false;
+
+        setFill(Constants.CIRCLE_FILL);
+        setStroke(Constants.CIRCLE_STROKE);
+    }
+
+    public boolean isAnimationRunning() {
+        return animationRunning;
     }
 
     public int getDistance() {
@@ -144,11 +158,11 @@ public class CircleNode extends Circle {
     }
 
     public boolean isObstacle() {
-        return isObstacle;
+        return obstacle;
     }
 
     public boolean isMovable() {
-        return !isObstacle;
+        return !obstacle;
     }
 
     public int row() {
@@ -157,19 +171,5 @@ public class CircleNode extends Circle {
 
     public int column() {
         return col;
-    }
-
-    public void setObstacle() {
-        this.isObstacle = true;
-
-        setFill(Constants.CIRCLE_OBSTACLE_FILL);
-        setStroke(Constants.CIRCLE_OBSTACLE_STROKE);
-    }
-
-    public void setMovable() {
-        this.isObstacle = false;
-
-        setFill(Constants.CIRCLE_FILL);
-        setStroke(Constants.CIRCLE_STROKE);
     }
 }

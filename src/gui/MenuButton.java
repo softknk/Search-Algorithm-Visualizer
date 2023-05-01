@@ -7,15 +7,16 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 public class MenuButton extends Button {
 
-    public MenuButton(String text, EventHandler<ActionEvent> event) {
+    public MenuButton(String text, EventHandler<ActionEvent> event, int width) {
         super(text);
 
         setOnAction(event);
 
-        setPrefWidth(130);
+        setPrefWidth(width);
         setBackground(new Background(new BackgroundFill(Color.rgb(65, 68, 80), new CornerRadii(5), Insets.EMPTY)));
         setBorder(new Border(new BorderStroke(Color.WHITE, BorderStrokeStyle.SOLID, new CornerRadii(5), new BorderWidths(1.5))));
         setTextFill(Color.WHITE);
@@ -32,5 +33,7 @@ public class MenuButton extends Button {
             setBackground(new Background(new BackgroundFill(Color.rgb(65, 68, 80), new CornerRadii(5), Insets.EMPTY)));
             setTextFill(Color.WHITE);
         });
+
+        setFont(Font.font("Consolas"));
     }
 }
