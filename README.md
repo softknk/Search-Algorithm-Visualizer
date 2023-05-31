@@ -1,1 +1,1 @@
-![Preview](https://github.com/csknkdhbw/webengineering_project/blob/main/res/preview_visualizer.png)
+![Preview](https://github.com/softknk/Search-Algorithm-Visualizer/blob/master/res/preview_visualizer.png)
