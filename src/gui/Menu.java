@@ -1,9 +1,7 @@
 package gui;
 
 import javafx.geometry.Insets;
-import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -59,6 +57,8 @@ public class Menu {
         comboBox.valueProperty().addListener((observable, oldValue, newValue) -> {
             Main.getData().update_curr_algo(newValue);
         });
+        comboBox.setPrefWidth(100);
+        comboBox.setPrefHeight(50);
 
         menu.getChildren().add(start_vis);
         menu.getChildren().add(comboBox);
