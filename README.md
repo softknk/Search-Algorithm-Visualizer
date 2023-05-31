@@ -1,0 +1,1 @@
+![Preview](https://github.com/csknkdhbw/webengineering_project/blob/main/res/preview_visualizer.png)
